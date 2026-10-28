@@ -1,0 +1,716 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#f5f4ee" />
+  <title>Telemetria — Demo de Antony</title>
+  <style>
+    :root{--paper:#f5f4ee;--ink:#252922;--muted:#777c70;--line:#e1e2d9;--green:#c6f36a;--card:#fffefa;--mono:"Consolas",monospace;--sans:Arial,sans-serif}
+    *{box-sizing:border-box}body{margin:0;background:var(--paper);color:var(--ink);font:14px var(--sans)}a{color:inherit}.top{height:68px;display:flex;align-items:center;justify-content:space-between;padding:0 max(24px,calc((100vw - 1200px)/2));border-bottom:1px solid var(--line);background:#faf9f4}.brand{font-weight:700;text-decoration:none}.brand span{display:inline-grid;width:30px;height:30px;place-items:center;margin-right:8px;border-radius:50%;background:var(--green);font:11px var(--mono)}.top-actions{display:flex;gap:10px}.top-actions a,.back{padding:10px 13px;border:1px solid var(--line);border-radius:4px;text-decoration:none;font:11px var(--mono)}.top-actions a:hover,.back:hover{border-color:var(--ink)}main{width:min(1200px,calc(100% - 40px));margin:35px auto 60px}.title-row{display:flex;align-items:end;justify-content:space-between;gap:16px;margin-bottom:22px}.eyebrow{color:var(--muted);font:11px var(--mono);letter-spacing:.1em;text-transform:uppercase}.title-row h1{margin:9px 0 0;font-size:clamp(28px,4vw,42px);letter-spacing:-.06em}.demo-label{padding:8px 11px;border:1px solid #d5e5bb;border-radius:99px;background:#edf5df;color:#587c29;font:10px var(--mono)}.layout{display:grid;grid-template-columns:230px minmax(0,1fr) 250px;gap:16px}.panel{border:1px solid var(--line);border-radius:7px;background:var(--card)}.side{padding:17px}.side h2,.panel-head h2{margin:0;font-size:13px}.side-label{margin:22px 0 9px;color:var(--muted);font:10px var(--mono);text-transform:uppercase}.asset{display:flex;width:100%;align-items:center;gap:10px;padding:12px 10px;border:0;border-radius:4px;background:transparent;text-align:left;cursor:pointer}.asset:hover,.asset.active{background:#eff3e8}.asset-dot{width:8px;height:8px;border-radius:50%;background:#83a940}.asset.offline .asset-dot{background:#c59b5b}.asset strong{display:block;font-size:12px}.asset small{display:block;margin-top:3px;color:var(--muted);font-size:10px}.asset-count{margin-left:auto;color:#7a806f;font:10px var(--mono)}.map-link{margin-top:22px;padding:12px;border:1px dashed #d2d6c9;border-radius:4px;color:#777c70;font-size:11px;line-height:1.55}.center{display:grid;gap:16px}.panel-pad{padding:17px}.panel-head{display:flex;align-items:center;justify-content:space-between;gap:10px}.live{color:#688d2e;font:10px var(--mono)}.live:before{display:inline-block;width:6px;height:6px;margin-right:6px;border-radius:50%;background:#91ba4b;content:""}.metrics{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:15px}.metric{padding:13px;border:1px solid #ebede5;border-radius:5px}.metric span{display:block;color:var(--muted);font-size:10px}.metric strong{display:block;margin-top:8px;font-size:21px;letter-spacing:-.04em}.metric small{color:#748b52;font:10px var(--mono)}.map{position:relative;min-height:320px;overflow:hidden;background:#e8ebdf}.map svg{position:absolute;width:100%;height:100%;inset:0}.map-caption{position:absolute;right:13px;bottom:12px;padding:8px 10px;border:1px solid #dfe3d6;border-radius:3px;background:#fffefa;font:10px var(--mono)}.map-badge{position:absolute;top:14px;left:14px;padding:8px 9px;border-radius:3px;background:#fffefa;font:10px var(--mono)}.map-tiles{position:absolute;inset:0;overflow:hidden}.map-tiles img{position:absolute;width:256px;height:256px;max-width:none}.map .map-overlay{pointer-events:none}    .map-controls{position:absolute;top:12px;right:12px;display:grid;overflow:hidden;border:1px solid #b9bdb2;border-radius:4px;box-shadow:0 1px 5px #0002}.map-controls button{width:32px;height:32px;border:0;background:#fffefa;color:var(--ink);font-size:19px;cursor:pointer}.map-controls button+button{border-top:1px solid var(--line)}.map-controls button:hover{background:#eff3e8}.map-attribution{position:absolute;right:0;bottom:0;padding:4px 6px;background:#fffefaeb;color:#4c5347;font:9px Arial,sans-serif;text-decoration:none}.map-attribution:hover{text-decoration:underline}.map-message{position:absolute;top:50%;left:50%;width:max-content;max-width:calc(100% - 32px);padding:10px 12px;border:1px solid var(--line);border-radius:4px;background:#fffefa;color:var(--muted);font-size:11px;text-align:center;transform:translate(-50%,-50%)}.map-message[hidden]{display:none}        .map-pin[hidden]{display:none}
+  </style>
+  <style>
+    .map-pin{position:absolute;top:43%;left:56%;display:grid;width:36px;height:36px;place-items:center;border:4px solid white;border-radius:50% 50% 50% 3px;background:var(--green);box-shadow:0 3px 10px #3333;transform:rotate(-45deg)}
+    .map-pin span{font-size:12px;transform:rotate(45deg)}
+    .map-pin[hidden]{display:none}
+    .live.offline{color:#a46b3c}
+    .live.offline:before{background:#c59b5b}
+    .right{padding:17px}
+    .right h2{margin:0 0 16px;font-size:13px}
+    .event{display:grid;grid-template-columns:8px 1fr;gap:9px;padding:12px 0;border-top:1px solid #eef0e9}
+    .event i{width:7px;height:7px;margin-top:4px;border-radius:50%;background:#92b64e}
+    .event strong{font-size:11px}
+    .event p{margin:4px 0;color:var(--muted);font-size:10px;line-height:1.5}
+    .event time{color:#8a8e83;font:9px var(--mono)}
+    .notice{margin-top:18px;padding:12px;border-radius:4px;background:#f1f2eb;color:#73786c;font-size:10px;line-height:1.6}
+    .back{display:inline-block;margin-top:20px}
+    .side-head{display:flex;align-items:center;justify-content:space-between;gap:8px}
+    .add-asset{padding:7px 9px;border:1px solid var(--line);border-radius:4px;background:white;color:var(--ink);font:10px var(--mono);cursor:pointer}
+    .add-asset:hover{border-color:var(--ink)}
+    .telemetry-form{display:grid;grid-template-columns:1fr 1fr 1.4fr auto;align-items:end;gap:8px;margin-top:14px;padding-top:13px;border-top:1px solid #ebede5}
+    .field{display:grid;gap:5px}
+    .field label{color:var(--muted);font:9px var(--mono)}
+    .field input,.field select{min-width:0;width:100%;padding:8px;border:1px solid var(--line);border-radius:3px;background:white;font:11px var(--sans)}
+    .save-reading{padding:9px 10px;border:0;border-radius:3px;background:var(--ink);color:white;font-size:10px;cursor:pointer}
+    .modal{position:fixed;z-index:10;inset:0;display:none;place-items:center;padding:18px;background:#20231f80}
+    .modal.open{display:grid}
+    .dialog{width:min(420px,100%);padding:22px;border:1px solid var(--line);border-radius:7px;background:var(--card);box-shadow:0 20px 70px #0002}
+    .dialog-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px}
+    .dialog h2{margin:0;font-size:17px}
+    .close{border:0;background:none;font-size:22px;cursor:pointer}
+    .dialog .field{margin:12px 0}
+    .dialog .field input{padding:11px}
+    .dialog .save-reading{width:100%;margin-top:8px;padding:11px}
+    .side-label{display:flex;align-items:center;justify-content:space-between}
+    .location-caption{max-width:60%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+    .map-panel{overflow:hidden;padding:0}
+    .route-heading{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:18px 18px 0}
+    .route-heading h2{margin:5px 0 0;font-size:16px}
+    .route-eyebrow,.route-provider{color:var(--muted);font:9px var(--mono);letter-spacing:.06em}
+    .route-form{display:grid;grid-template-columns:1fr auto 1fr auto;align-items:end;gap:9px;padding:16px 18px 10px}
+    .route-field{display:grid;gap:6px;min-width:0}
+    .route-field span{color:var(--muted);font:9px var(--mono)}
+    .route-field input{width:100%;min-width:0;padding:10px;border:1px solid var(--line);border-radius:4px;background:white;color:var(--ink);font:12px var(--sans)}
+    .locate-button,.route-button{min-height:37px;padding:0 11px;border:1px solid var(--line);border-radius:4px;background:white;color:var(--ink);font-size:10px;cursor:pointer}
+    .route-button{border-color:var(--ink);background:var(--ink);color:white;font-weight:600}
+    .locate-button:hover,.route-button:hover{filter:brightness(.93)}
+    .locate-button:disabled,.route-button:disabled{opacity:.55;cursor:wait}
+    .route-status{min-height:17px;margin:0;padding:0 18px 10px;color:var(--muted);font-size:10px;line-height:1.55}
+    .route-status.error{color:#a34838}
+    .map{height:min(58vh,520px);min-height:330px;width:100%;background:#e8ebdf;touch-action:none;cursor:grab}
+    .map.dragging{cursor:grabbing}
+    .route-results{padding:14px 18px 18px}
+    .route-results[hidden]{display:none}
+    .route-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+    .route-stats>div{padding:11px;border:1px solid #ebede5;border-radius:4px}
+    .route-stats span{display:block;color:var(--muted);font-size:9px}
+    .route-stats strong{display:block;margin-top:6px;font-size:13px}
+    .route-details{margin-top:13px;border-top:1px solid var(--line);padding-top:12px}
+    .route-details summary{color:#49563b;font:11px var(--mono);cursor:pointer}
+    .route-endpoints{margin-top:12px;color:var(--muted);font-size:10px;line-height:1.6}
+    .route-details ol{display:grid;gap:7px;max-height:230px;overflow:auto;margin:12px 0 0;padding-left:23px}
+    .route-details li{padding-left:4px;color:#565c51;font-size:11px;line-height:1.5}
+    .route-details li span{display:block;color:var(--muted);font:9px var(--mono)}
+    @media(max-width:930px){
+      .layout{grid-template-columns:210px minmax(0,1fr)}
+      .right{grid-column:1/-1;display:grid;grid-template-columns:repeat(3,1fr);gap:0 14px}
+      .right h2,.notice{grid-column:1/-1}
+    }
+    @media(max-width:620px){
+      .top{padding:0 16px}
+      .top-actions a{padding:9px;font-size:9px}
+      .layout{grid-template-columns:1fr}
+      .side{display:grid;grid-template-columns:repeat(3,1fr);gap:3px}
+      .side-head,.side-label,.map-link,#asset-list{grid-column:1/-1}
+      .side-label{margin:10px 0 0}
+      .asset{padding:9px 5px}
+      .right{grid-column:auto;display:block}
+      .map{min-height:260px}
+      .title-row{align-items:start;flex-direction:column}
+      .telemetry-form{grid-template-columns:1fr 1fr}
+      .save-reading{min-height:35px}
+      .route-heading{align-items:flex-start;flex-direction:column}
+      .route-form{grid-template-columns:1fr 1fr}
+      .route-field{grid-column:1/-1}
+      .locate-button,.route-button{width:100%}
+      .route-stats{grid-template-columns:repeat(2,1fr)}
+      .map{height:55vh;min-height:300px}
+    }
+  </style>
+</head>
+<body>
+  <header class="top">
+    <a class="brand" href="../index.html#projetos"><span>AG</span>ANTONY / LAB</a>
+    <div class="top-actions"><a href="../index.html#projetos">← Portfólio</a><a href="telemetria.html" download="telemetria.html">Baixar código ↓</a></div>
+  </header>
+  <main>
+    <div class="title-row"><div><div class="eyebrow">Projeto 01 · Demonstração front-end</div><h1>Central de telemetria</h1></div><span class="demo-label">DEMO · SEM GPS REAL</span></div>
+    <div class="layout">
+      <aside class="panel side">
+        <div class="side-head"><h2>Ativos monitorados</h2><button class="add-asset" id="open-asset">＋ Ativo</button></div><div class="side-label">Frota · <span id="asset-count">3</span> unidades</div>
+        <div id="asset-list"></div>
+        <div class="map-link">Ativos e leituras são exemplos locais. Não há conexão com veículos, dispositivos ou GPS real.</div>
+      </aside>
+      <section class="center">
+        <div class="panel panel-pad">
+          <div class="panel-head"><h2 id="asset-title"></h2><span class="live" id="live-status"></span></div>
+          <div class="metrics">
+            <div class="metric"><span>Velocidade</span><strong><span id="speed"></span> <small>km/h</small></strong><small>Leitura informada</small></div>
+            <div class="metric"><span>Ignição</span><strong id="ignition">Ligada</strong><small>Motor em operação</small></div>
+            <div class="metric"><span>Local informado</span><strong id="signal" class="location-caption"></strong><small id="signal-time"></small></div>
+          </div>
+          <form class="telemetry-form" id="reading-form">
+            <div class="field"><label for="reading-speed">VELOCIDADE · KM/H</label><input id="reading-speed" type="number" min="0" max="300" required /></div>
+            <div class="field"><label for="reading-ignition">IGNIÇÃO</label><select id="reading-ignition"><option value="true">Ligada</option><option value="false">Desligada</option></select></div>
+            <div class="field"><label for="reading-location">LOCALIZAÇÃO / NOTA</label><input id="reading-location" maxlength="80" required /></div>
+            <button class="save-reading" type="submit">Atualizar leitura</button>
+          </form>
+        </div>
+        <div class="panel map-panel">
+          <div class="route-heading"><div><span class="route-eyebrow">ROTA RODOVIÁRIA · AMAZONAS</span><h2>Planejar trajeto</h2></div><span class="route-provider">Esri + OSRM</span></div>
+          <form id="route-form" class="route-form">
+            <label class="route-field"><span>ORIGEM</span><input id="route-origin" required autocomplete="off" value="Manaus, Amazonas" placeholder="Cidade, endereço ou coordenadas" /></label>
+            <button type="button" class="locate-button" id="use-location">Usar minha localização</button>
+            <label class="route-field"><span>DESTINO</span><input id="route-destination" required autocomplete="off" value="Presidente Figueiredo, Amazonas" placeholder="Ex.: Presidente Figueiredo, Amazonas" /></label>
+            <button class="route-button" id="calculate-route" type="submit">Calcular rota ↗</button>
+          </form>
+          <p class="route-status" id="route-status" role="status" aria-live="polite">Informe origem e destino e calcule uma rota. A busca requer internet.</p>
+          <div class="map" id="map" role="application" aria-label="Mapa interativo do Amazonas com rota rodoviária">
+            <div class="map-tiles" id="map-tiles" aria-hidden="true"></div>
+            <svg class="map-overlay" id="map-overlay" aria-hidden="true"></svg>
+            <div class="map-message" id="map-message" role="status" hidden></div>
+            <div class="map-controls" aria-label="Controles de zoom">
+              <button type="button" id="zoom-in" aria-label="Aumentar zoom">+</button>
+              <button type="button" id="zoom-out" aria-label="Diminuir zoom">−</button>
+            </div>
+            <a class="map-attribution" href="https://www.esri.com/" target="_blank" rel="noopener noreferrer">Tiles © Esri · © OpenStreetMap contributors</a>
+          </div>
+          <div class="route-results" id="route-results" hidden>
+            <div class="route-stats">
+              <div><span>Distância</span><strong id="route-distance">—</strong></div>
+              <div><span>Tempo estimado</span><strong id="route-duration">—</strong></div>
+              <div><span>Chegada estimada</span><strong id="route-arrival">—</strong></div>
+              <div><span>Trechos</span><strong id="route-step-count">—</strong></div>
+            </div>
+            <details class="route-details">
+              <summary>Ver percurso detalhado</summary>
+              <div class="route-endpoints" id="route-endpoints"></div>
+              <ol id="route-steps"></ol>
+            </details>
+          </div>
+        </div>
+      </section>
+      <aside class="panel right">
+        <h2>Atividade recente</h2>
+        <div id="activity-list"></div>
+        <div class="notice">Busca de endereços pelo Nominatim e rotas pelo OSRM, serviços públicos sem garantia de disponibilidade. Endereços pesquisados e coordenadas da rota são enviados a esses serviços; sua posição só é acessada com sua permissão. Estimativas não incluem trânsito e não substituem navegação profissional.</div>
+      </aside>
+    </div>
+    <a class="back" href="../index.html#projetos">← Voltar aos projetos</a>
+  </main>
+  <div class="modal" id="asset-modal" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+    <form class="dialog" id="asset-form">
+      <div class="dialog-head"><h2 id="modal-title">Adicionar ativo</h2><button class="close" type="button" id="close-asset" aria-label="Fechar">×</button></div>
+      <div class="field"><label for="asset-name">NOME DO ATIVO</label><input id="asset-name" name="name" required maxlength="45" placeholder="Ex.: Caminhão 04" /></div>
+      <div class="field"><label for="asset-code">IDENTIFICAÇÃO</label><input id="asset-code" name="code" required maxlength="24" placeholder="Ex.: ABC · 1234" /></div>
+      <button class="save-reading" type="submit">Adicionar à frota</button>
+    </form>
+  </div>
+  <script>
+    const defaultAssets = [
+      { id: "van", name: "Van Norte", code: "AMZ · 04K2", speed: 48, ignition: true, location: "Manaus · Amazonas", online: true },
+      { id: "truck", name: "Carga 07", code: "AMZ · 91J3", speed: 62, ignition: true, location: "Distrito Industrial", online: true },
+      { id: "moto", name: "Entrega 12", code: "AMZ · 22M8", speed: 0, ignition: false, location: "Sinal indisponível", online: false }
+    ];
+    let assets = defaultAssets.map((asset) => ({ ...asset }));
+    let currentId = assets[0].id;
+    const assetList = document.querySelector("#asset-list");
+    const activityList = document.querySelector("#activity-list");
+    const activities = [];
+    const currentAsset = () => assets.find((asset) => asset.id === currentId);
+    function renderAssets() {
+      assetList.replaceChildren();
+      assets.forEach((asset, index) => {
+        const button = document.createElement("button");
+        button.className = `asset${asset.id === currentId ? " active" : ""}${asset.online ? "" : " offline"}`;
+        button.dataset.asset = asset.id;
+        const dot = document.createElement("i");
+        dot.className = "asset-dot";
+        const text = document.createElement("span");
+        const name = document.createElement("strong");
+        name.textContent = asset.name;
+        const code = document.createElement("small");
+        code.textContent = asset.code;
+        text.append(name, code);
+        const count = document.createElement("span");
+        count.className = "asset-count";
+        count.textContent = String(index + 1).padStart(2, "0");
+        button.append(dot, text, count);
+        button.addEventListener("click", () => {
+          currentId = asset.id;
+          render();
+        });
+        assetList.append(button);
+      });
+      document.querySelector("#asset-count").textContent = String(assets.length);
+    }
+    function addActivity(title, description) {
+      activities.unshift({ title, description, time: new Intl.DateTimeFormat("pt-BR", { hour: "2-digit", minute: "2-digit" }).format(new Date()) });
+      activities.splice(5);
+    }
+    function renderActivities() {
+      activityList.replaceChildren();
+      activities.forEach((activity) => {
+        const event = document.createElement("div");
+        event.className = "event";
+        const dot = document.createElement("i");
+        const body = document.createElement("div");
+        const title = document.createElement("strong");
+        title.textContent = activity.title;
+        const description = document.createElement("p");
+        description.textContent = activity.description;
+        const time = document.createElement("time");
+        time.textContent = activity.time;
+        body.append(title, description, time);
+        event.append(dot, body);
+        activityList.append(event);
+      });
+      if (!activities.length) {
+        const empty = document.createElement("div");
+        empty.className = "notice";
+        empty.textContent = "As atualizações da sessão aparecerão aqui.";
+        activityList.append(empty);
+      }
+    }
+    function render() {
+      renderAssets();
+      renderActivities();
+      const asset = currentAsset();
+      if (!asset) return;
+      document.querySelector("#asset-title").textContent = `${asset.name} · ${asset.code}`;
+      document.querySelector("#speed").textContent = String(asset.speed);
+      document.querySelector("#ignition").textContent = asset.ignition ? "Ligada" : "Desligada";
+      const liveStatus = document.querySelector("#live-status");
+      liveStatus.textContent = asset.online ? "ATIVO" : "SEM SINAL";
+      liveStatus.classList.toggle("offline", !asset.online);
+      document.querySelector("#signal").textContent = asset.location;
+      document.querySelector("#signal-time").textContent = asset.online ? "Leitura manual" : "Leitura indisponível";
+      document.querySelector("#reading-speed").value = String(asset.speed);
+      document.querySelector("#reading-ignition").value = String(asset.ignition);
+      document.querySelector("#reading-location").value = asset.location;
+    }
+    document.querySelector("#reading-form").addEventListener("submit", (event) => {
+      event.preventDefault();
+      const asset = currentAsset();
+      if (!asset) return;
+      const speed = Number(document.querySelector("#reading-speed").value);
+      const locationInput = document.querySelector("#reading-location");
+      const location = locationInput.value.trim();
+      locationInput.setCustomValidity(location ? "" : "Informe uma localização ou nota para esta leitura.");
+      if (!event.currentTarget.reportValidity()) return;
+      asset.speed = speed;
+      asset.ignition = document.querySelector("#reading-ignition").value === "true";
+      asset.location = location;
+      asset.online = true;
+      addActivity("Leitura atualizada", `${asset.name} · ${speed} km/h · ${location}`);
+      render();
+    });
+    const modal = document.querySelector("#asset-modal");
+    document.querySelector("#open-asset").addEventListener("click", () => {
+      modal.classList.add("open");
+      document.querySelector("#asset-name").focus();
+    });
+    document.querySelector("#close-asset").addEventListener("click", () => modal.classList.remove("open"));
+    modal.addEventListener("click", (event) => {
+      if (event.target === modal) modal.classList.remove("open");
+    });
+    document.querySelector("#asset-form").addEventListener("submit", (event) => {
+      event.preventDefault();
+      const form = event.currentTarget;
+      const data = new FormData(form);
+      const name = String(data.get("name")).trim();
+      const code = String(data.get("code")).trim();
+      const nameInput = document.querySelector("#asset-name");
+      const codeInput = document.querySelector("#asset-code");
+      nameInput.setCustomValidity(name ? "" : "Informe um nome para o ativo.");
+      codeInput.setCustomValidity(code ? "" : "Informe a identificação do ativo.");
+      if (!form.reportValidity()) return;
+      const asset = { id: `asset-${Date.now()}-${assets.length}`, name, code, speed: 0, ignition: false, location: "Local não informado", online: false };
+      assets.push(asset);
+      currentId = asset.id;
+      addActivity("Ativo adicionado", `${asset.name} · ${asset.code}`);
+      form.reset();
+      modal.classList.remove("open");
+      render();
+    });
+    const routeMapElement = document.querySelector("#map");
+    const routeStatus = document.querySelector("#route-status");
+    const routeForm = document.querySelector("#route-form");
+    const routeButton = document.querySelector("#calculate-route");
+    const originInput = document.querySelector("#route-origin");
+    const destinationInput = document.querySelector("#route-destination");
+    const mapTiles = document.querySelector("#map-tiles");
+    const mapOverlay = document.querySelector("#map-overlay");
+    const mapMessage = document.querySelector("#map-message");
+    let mapCenter = { lat: -4.4, lon: -64.5 };
+    let mapZoom = 5;
+    let currentRoute = null;
+    let mapDrag = null;
+    let mapRenderId = 0;
+    let routeOrigin = null;
+    let routeDestination = null;
+    let lastGeocodeAt = 0;
+    const geocodeCache = new Map();
+    const tileSize = 256;
+    const maxLatitude = 85.05112878;
+    function projectCoordinates(lat, lon, zoom) {
+      const boundedLat = Math.max(-maxLatitude, Math.min(maxLatitude, lat));
+      const scale = tileSize * 2 ** zoom;
+      const sinLat = Math.sin(boundedLat * Math.PI / 180);
+      return {
+        x: (lon + 180) / 360 * scale,
+        y: (0.5 - Math.log((1 + sinLat) / (1 - sinLat)) / (4 * Math.PI)) * scale
+      };
+    }
+    function setMapView(center, zoom) {
+      mapCenter = center;
+      mapZoom = Math.max(2, Math.min(19, zoom));
+      drawMap();
+    }
+    function drawMap() {
+      const { width, height } = routeMapElement.getBoundingClientRect();
+      if (!width || !height) return;
+      mapTiles.style.transform = "";
+      mapOverlay.style.transform = "";
+      const center = projectCoordinates(mapCenter.lat, mapCenter.lon, mapZoom);
+      const left = center.x - width / 2;
+      const top = center.y - height / 2;
+      const firstX = Math.floor(left / tileSize);
+      const lastX = Math.floor((left + width) / tileSize);
+      const firstY = Math.floor(top / tileSize);
+      const lastY = Math.floor((top + height) / tileSize);
+      const tileCount = 2 ** mapZoom;
+      const renderId = ++mapRenderId;
+      let tileTotal = 0;
+      for (let tileY = firstY; tileY <= lastY; tileY += 1) {
+        if (tileY >= 0 && tileY < tileCount) tileTotal += lastX - firstX + 1;
+      }
+      let tileSettled = 0;
+      let tileLoaded = 0;
+      let tileFailed = 0;
+      mapMessage.hidden = true;
+      mapTiles.replaceChildren();
+      for (let tileY = firstY; tileY <= lastY; tileY += 1) {
+        if (tileY < 0 || tileY >= tileCount) continue;
+        for (let tileX = firstX; tileX <= lastX; tileX += 1) {
+          const image = document.createElement("img");
+          image.addEventListener("load", () => finishTileLoad(renderId, ++tileSettled, tileTotal, ++tileLoaded, tileFailed));
+          image.addEventListener("error", () => finishTileLoad(renderId, ++tileSettled, tileTotal, tileLoaded, ++tileFailed));
+          const wrappedX = ((tileX % tileCount) + tileCount) % tileCount;
+          image.src = `https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/${mapZoom}/${tileY}/${wrappedX}`;
+          image.alt = "";
+          image.draggable = false;
+          image.style.left = `${tileX * tileSize - left}px`;
+          image.style.top = `${tileY * tileSize - top}px`;
+          mapTiles.append(image);
+        }
+      }
+      mapOverlay.setAttribute("viewBox", `0 0 ${width} ${height}`);
+      mapOverlay.replaceChildren();
+      if (currentRoute) drawRouteOverlay(currentRoute, left, top);
+    }
+    function finishTileLoad(renderId, settled, total, loadedCount, failedCount) {
+      if (renderId !== mapRenderId || settled !== total) return;
+      mapMessage.textContent = loadedCount === 0
+        ? "Não foi possível carregar o mapa. Verifique sua conexão."
+        : failedCount
+          ? "Parte do mapa não carregou. Tente novamente."
+          : "";
+      mapMessage.hidden = failedCount === 0;
+    }
+    function drawRouteOverlay(routeData, left, top) {
+      const namespace = "http://www.w3.org/2000/svg";
+      const points = routeData.route.geometry.coordinates.map(([lon, lat]) => {
+        const point = projectCoordinates(lat, lon, mapZoom);
+        return { x: point.x - left, y: point.y - top };
+      });
+      if (!points.length) return;
+      const line = document.createElementNS(namespace, "polyline");
+      line.setAttribute("points", points.map((point) => `${point.x},${point.y}`).join(" "));
+      line.setAttribute("fill", "none");
+      line.setAttribute("stroke", "#597d25");
+      line.setAttribute("stroke-width", "6");
+      line.setAttribute("stroke-linecap", "round");
+      line.setAttribute("stroke-linejoin", "round");
+      line.setAttribute("opacity", "0.88");
+      mapOverlay.append(line);
+      [
+        { place: routeData.origin, color: "#54772b" },
+        { place: routeData.destination, color: "#be6b51" }
+      ].forEach(({ place, color }) => {
+        const point = projectCoordinates(place.lat, place.lon, mapZoom);
+        const marker = document.createElementNS(namespace, "circle");
+        marker.setAttribute("cx", String(point.x - left));
+        marker.setAttribute("cy", String(point.y - top));
+        marker.setAttribute("r", "8");
+        marker.setAttribute("fill", color);
+        marker.setAttribute("stroke", "#fffefa");
+        marker.setAttribute("stroke-width", "3");
+        mapOverlay.append(marker);
+      });
+    }
+    function fitRoute(route) {
+      const coordinates = route.geometry.coordinates;
+      const bounds = { minLon: Infinity, maxLon: -Infinity, minLat: Infinity, maxLat: -Infinity };
+      coordinates.forEach(([lon, lat]) => {
+        bounds.minLon = Math.min(bounds.minLon, lon);
+        bounds.maxLon = Math.max(bounds.maxLon, lon);
+        bounds.minLat = Math.min(bounds.minLat, lat);
+        bounds.maxLat = Math.max(bounds.maxLat, lat);
+      });
+      const { width, height } = routeMapElement.getBoundingClientRect();
+      mapZoom = 2;
+      for (let zoom = 18; zoom >= 2; zoom -= 1) {
+        const northwest = projectCoordinates(bounds.maxLat, bounds.minLon, zoom);
+        const southeast = projectCoordinates(bounds.minLat, bounds.maxLon, zoom);
+        if (southeast.x - northwest.x <= width - 64 && southeast.y - northwest.y <= height - 64) {
+          mapZoom = zoom;
+          break;
+        }
+      }
+      mapCenter = {
+        lat: (bounds.minLat + bounds.maxLat) / 2,
+        lon: (bounds.minLon + bounds.maxLon) / 2
+      };
+    }
+    document.querySelector("#zoom-in").addEventListener("click", () => setMapView(mapCenter, mapZoom + 1));
+    document.querySelector("#zoom-out").addEventListener("click", () => setMapView(mapCenter, mapZoom - 1));
+    routeMapElement.addEventListener("pointerdown", (event) => {
+      if (event.button !== 0 || event.target.closest(".map-controls, .map-attribution")) return;
+      mapDrag = { x: event.clientX, y: event.clientY };
+      routeMapElement.classList.add("dragging");
+      routeMapElement.setPointerCapture(event.pointerId);
+    });
+    routeMapElement.addEventListener("pointermove", (event) => {
+      if (!mapDrag) return;
+      const offsetX = event.clientX - mapDrag.x;
+      const offsetY = event.clientY - mapDrag.y;
+      mapTiles.style.transform = `translate(${offsetX}px, ${offsetY}px)`;
+      mapOverlay.style.transform = `translate(${offsetX}px, ${offsetY}px)`;
+    });
+    function finishMapDrag(event) {
+      if (!mapDrag) return;
+      const offsetX = event.clientX - mapDrag.x;
+      const offsetY = event.clientY - mapDrag.y;
+      const center = projectCoordinates(mapCenter.lat, mapCenter.lon, mapZoom);
+      const scale = tileSize * 2 ** mapZoom;
+      const worldX = center.x - offsetX;
+      const worldY = Math.max(0, Math.min(scale, center.y - offsetY));
+      const latitudeAngle = Math.PI - 2 * Math.PI * worldY / scale;
+      mapCenter = {
+        lat: Math.atan((Math.exp(latitudeAngle) - Math.exp(-latitudeAngle)) / 2) * 180 / Math.PI,
+        lon: worldX / scale * 360 - 180
+      };
+      mapDrag = null;
+      routeMapElement.classList.remove("dragging");
+      drawMap();
+    }
+    routeMapElement.addEventListener("pointerup", finishMapDrag);
+    routeMapElement.addEventListener("pointercancel", finishMapDrag);
+    function setRouteStatus(message, isError = false) {
+      routeStatus.textContent = message;
+      routeStatus.classList.toggle("error", isError);
+    }
+    async function fetchJson(url) {
+      const controller = new AbortController();
+      const timeout = window.setTimeout(() => controller.abort(), 20000);
+      try {
+        const response = await fetch(url, { signal: controller.signal, headers: { Accept: "application/json" } });
+        if (!response.ok) throw new Error(`O serviço respondeu com status ${response.status}.`);
+        return await response.json();
+      } catch (error) {
+        if (error.name === "AbortError") throw new Error("A consulta demorou demais. Tente novamente.");
+        throw error;
+      } finally {
+        window.clearTimeout(timeout);
+      }
+    }
+    function coordinatesFromText(text) {
+      const match = text.trim().match(/^(-?\d{1,2}(?:\.\d+)?)\s*[,;]\s*(-?\d{1,3}(?:\.\d+)?)$/);
+      if (!match) return null;
+      const lat = Number(match[1]);
+      const lon = Number(match[2]);
+      if (!Number.isFinite(lat) || !Number.isFinite(lon) || Math.abs(lat) > 90 || Math.abs(lon) > 180) {
+        throw new Error("Coordenadas inválidas. Use latitude, longitude.");
+      }
+      return { lat, lon, label: `${lat.toFixed(5)}, ${lon.toFixed(5)}` };
+    }
+    async function geocode(query) {
+      const normalized = query.trim().toLocaleLowerCase("pt-BR");
+      if (geocodeCache.has(normalized)) return geocodeCache.get(normalized);
+      const wait = Math.max(0, 1100 - (Date.now() - lastGeocodeAt));
+      if (wait) await new Promise((resolve) => window.setTimeout(resolve, wait));
+      lastGeocodeAt = Date.now();
+      const bounds = {
+        viewbox: "-73.9,-2.2,-56.0,-10.0",
+        bounded: "1"
+      };
+      const parts = query.split(",").map((part) => part.trim()).filter(Boolean);
+      let results = [];
+      if (parts.length >= 2 && parts.length <= 4) {
+        const structured = new URLSearchParams({
+          format: "jsonv2",
+          addressdetails: "1",
+          limit: "1",
+          countrycodes: "br",
+          ...bounds,
+          city: parts[parts.length - 2],
+          state: parts[parts.length - 1],
+          country: "Brasil"
+        });
+        if (parts.length > 2) structured.set("street", parts.slice(0, -2).join(", "));
+        results = await fetchJson(`https://nominatim.openstreetmap.org/search?${structured}`);
+      }
+      if ((!Array.isArray(results) || !results.length) && parts.length > 2) {
+        const params = new URLSearchParams({
+          format: "jsonv2",
+          addressdetails: "1",
+          limit: "5",
+          countrycodes: "br",
+          ...bounds,
+          q: query
+        });
+        results = await fetchJson(`https://nominatim.openstreetmap.org/search?${params}`);
+      }
+      if ((!Array.isArray(results) || !results.length) && parts.length <= 2) {
+        const params = new URLSearchParams({
+        format: "jsonv2",
+        limit: "1",
+        countrycodes: "br",
+        ...bounds,
+        q: query
+        });
+        results = await fetchJson(`https://nominatim.openstreetmap.org/search?${params}`);
+      }
+      if (!Array.isArray(results) || !results.length) {
+        throw new Error(`Não encontrei “${query}” no Amazonas. Confira o nome da cidade ou informe as coordenadas.`);
+      }
+      const point = {
+        lat: Number(results[0].lat),
+        lon: Number(results[0].lon),
+        label: results[0].display_name
+      };
+      if (!Number.isFinite(point.lat) || !Number.isFinite(point.lon)) throw new Error("O serviço de busca retornou uma localização inválida.");
+      geocodeCache.set(normalized, point);
+      return point;
+    }
+    async function resolvePlace(input, cached) {
+      if (cached && cached.inputValue === input.value) return cached;
+      const coordinates = coordinatesFromText(input.value);
+      return coordinates || geocode(input.value);
+    }
+    function formatDistance(meters) {
+      return meters < 1000 ? `${Math.round(meters)} m` : `${(meters / 1000).toLocaleString("pt-BR", { maximumFractionDigits: 1 })} km`;
+    }
+    function formatDuration(seconds) {
+      const minutes = Math.max(1, Math.round(seconds / 60));
+      const hours = Math.floor(minutes / 60);
+      const remainingMinutes = minutes % 60;
+      if (!hours) return `${minutes} min`;
+      return remainingMinutes ? `${hours} h ${remainingMinutes} min` : `${hours} h`;
+    }
+    function instructionFor(step) {
+      const maneuver = step.maneuver || {};
+      const typeLabels = {
+        depart: "Inicie",
+        arrive: "Chegue ao destino",
+        turn: "Vire",
+        "new name": "Continue",
+        "continue": "Continue",
+        merge: "Acesse",
+        "on ramp": "Entre na via",
+        "off ramp": "Saia da via",
+        fork: "Mantenha-se",
+        "end of road": "No fim da via, vire",
+        "use lane": "Use a faixa indicada",
+        roundabout: "Na rotatória, siga",
+        rotary: "Na rotatória, siga",
+        "roundabout turn": "Na rotatória, vire",
+        notification: "Atenção"
+      };
+      const modifiers = {
+        uturn: "faça o retorno",
+        "sharp right": "à direita",
+        right: "à direita",
+        "slight right": "levemente à direita",
+        straight: "em frente",
+        "slight left": "levemente à esquerda",
+        left: "à esquerda",
+        "sharp left": "acentuadamente à esquerda"
+      };
+      const label = typeLabels[maneuver.type] || "Siga";
+      const direction = modifiers[maneuver.modifier];
+      const road = step.name ? ` pela ${step.name}` : "";
+      if (maneuver.type === "arrive") return "Você chegou ao destino.";
+      if (maneuver.type === "depart") return `Inicie${road}.`;
+      return `${label}${direction ? ` ${direction}` : ""}${road}.`;
+    }
+    function renderRoute(route, origin, destination) {
+      currentRoute = { route, origin, destination };
+      fitRoute(route);
+      drawMap();
+      document.querySelector("#route-results").hidden = false;
+      document.querySelector("#route-distance").textContent = formatDistance(route.distance);
+      document.querySelector("#route-duration").textContent = `${formatDuration(route.duration)} · sem trânsito`;
+      document.querySelector("#route-arrival").textContent = new Intl.DateTimeFormat("pt-BR", { hour: "2-digit", minute: "2-digit" })
+        .format(new Date(Date.now() + route.duration * 1000));
+      const steps = route.legs.flatMap((leg) => leg.steps || []);
+      document.querySelector("#route-step-count").textContent = String(steps.length);
+      const endpoints = document.querySelector("#route-endpoints");
+      endpoints.textContent = `Origem: ${origin.label} (${origin.lat.toFixed(5)}, ${origin.lon.toFixed(5)}) · Destino: ${destination.label} (${destination.lat.toFixed(5)}, ${destination.lon.toFixed(5)}). Tempo calculado sem dados de trânsito em tempo real.`;
+      const stepList = document.querySelector("#route-steps");
+      stepList.replaceChildren();
+      steps.forEach((step) => {
+        const item = document.createElement("li");
+        item.textContent = instructionFor(step);
+        const distance = document.createElement("span");
+        distance.textContent = formatDistance(step.distance);
+        item.append(distance);
+        stepList.append(item);
+      });
+      setRouteStatus("Rota rodoviária carregada. Consulte a atribuição do mapa e confirme as condições locais antes de viajar.");
+    }
+    originInput.addEventListener("input", () => { routeOrigin = null; });
+    destinationInput.addEventListener("input", () => { routeDestination = null; });
+    document.querySelector("#use-location").addEventListener("click", () => {
+      if (!navigator.geolocation) {
+        setRouteStatus("Este navegador não oferece geolocalização. Digite a origem manualmente.", true);
+        return;
+      }
+      const button = document.querySelector("#use-location");
+      button.disabled = true;
+      setRouteStatus("Aguardando permissão do navegador para acessar sua localização…");
+      navigator.geolocation.getCurrentPosition((position) => {
+        const lat = position.coords.latitude;
+        const lon = position.coords.longitude;
+        const inputValue = `${lat.toFixed(6)}, ${lon.toFixed(6)}`;
+        routeOrigin = { lat, lon, label: "Minha localização", inputValue };
+        originInput.value = inputValue;
+        button.disabled = false;
+        setRouteStatus("Localização obtida. Ao calcular a rota, as coordenadas serão enviadas ao serviço público OSRM.");
+        setMapView({ lat, lon }, 11);
+      }, (error) => {
+        button.disabled = false;
+        const message = error.code === error.PERMISSION_DENIED
+          ? "Permissão negada. Autorize a localização ou informe a origem manualmente."
+          : error.code === error.POSITION_UNAVAILABLE
+            ? "A posição não está disponível. Tente novamente ou informe a origem manualmente."
+            : "Tempo esgotado ao buscar a posição. Tente novamente ou informe a origem manualmente.";
+        setRouteStatus(message, true);
+      }, { enableHighAccuracy: true, timeout: 15000, maximumAge: 60000 });
+    });
+    routeForm.addEventListener("submit", async (event) => {
+      event.preventDefault();
+      const originQuery = originInput.value.trim();
+      const destinationQuery = destinationInput.value.trim();
+      originInput.setCustomValidity(originQuery ? "" : "Informe a origem.");
+      destinationInput.setCustomValidity(destinationQuery ? "" : "Informe o destino.");
+      if (!routeForm.reportValidity()) return;
+      routeButton.disabled = true;
+      currentRoute = null;
+      drawMap();
+      document.querySelector("#route-results").hidden = true;
+      setRouteStatus("Buscando os locais e calculando a rota rodoviária…");
+      try {
+        const origin = await resolvePlace(originInput, routeOrigin);
+        routeOrigin = { ...origin, inputValue: originQuery };
+        const destination = await resolvePlace(destinationInput, routeDestination);
+        routeDestination = { ...destination, inputValue: destinationQuery };
+        const coordinates = `${origin.lon},${origin.lat};${destination.lon},${destination.lat}`;
+        const params = new URLSearchParams({ overview: "full", steps: "true", geometries: "geojson", alternatives: "false" });
+        const result = await fetchJson(`https://router.project-osrm.org/route/v1/driving/${coordinates}?${params}`);
+        if (result.code !== "Ok" || !Array.isArray(result.routes) || !result.routes.length) {
+          throw new Error(result.code === "NoRoute"
+            ? "Não há rota rodoviária encontrada entre esses pontos nos dados do mapa."
+            : "O serviço não conseguiu calcular essa rota. Verifique os locais e tente novamente.");
+        }
+        renderRoute(result.routes[0], origin, destination);
+      } catch (error) {
+        setRouteStatus(error.message || "Falha ao consultar os serviços de mapa. Tente novamente mais tarde.", true);
+      } finally {
+        routeButton.disabled = false;
+      }
+    });
+    window.addEventListener("resize", () => {
+      if (currentRoute) fitRoute(currentRoute.route);
+      drawMap();
+    });
+    document.addEventListener("keydown", (event) => {
+      if (event.key === "Escape") modal.classList.remove("open");
+    });
+    render();
+    drawMap();
+    setRouteStatus("Mapa Esri pronto (requer internet). Use GPS ou informe origem e destino. Estimativas não incluem trânsito.");
+  </script>
+</body>
+</html>

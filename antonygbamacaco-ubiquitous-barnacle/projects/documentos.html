@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#f5f4ee" />
+  <title>Documentos — Demo de Antony</title>
+  <style>
+    :root{--paper:#f5f4ee;--ink:#252922;--muted:#777c70;--line:#e1e2d9;--green:#c6f36a;--card:#fffefa;--mono:"Consolas",monospace;--sans:Arial,sans-serif}
+    *{box-sizing:border-box}body{margin:0;background:var(--paper);color:var(--ink);font:14px var(--sans)}a{color:inherit}.top{height:68px;display:flex;align-items:center;justify-content:space-between;padding:0 max(24px,calc((100vw - 1060px)/2));border-bottom:1px solid var(--line);background:#faf9f4}.brand{font-weight:700;text-decoration:none}.brand span{display:inline-grid;width:30px;height:30px;place-items:center;margin-right:8px;border-radius:50%;background:var(--green);font:11px var(--mono)}.top-actions{display:flex;gap:10px}.top-actions a,.back{padding:10px 13px;border:1px solid var(--line);border-radius:4px;text-decoration:none;font:11px var(--mono)}.top-actions a:hover,.back:hover{border-color:var(--ink)}main{width:min(1060px,calc(100% - 40px));margin:35px auto 60px}.title-row{display:flex;align-items:end;justify-content:space-between;gap:16px;margin-bottom:22px}.eyebrow{color:var(--muted);font:11px var(--mono);letter-spacing:.1em;text-transform:uppercase}.title-row h1{margin:9px 0 0;font-size:clamp(28px,4vw,42px);letter-spacing:-.06em}.demo-label{padding:8px 11px;border:1px solid #d5e5bb;border-radius:99px;background:#edf5df;color:#587c29;font:10px var(--mono)}.summary{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:17px}.stat{padding:15px;border:1px solid var(--line);border-radius:6px;background:var(--card)}.stat span{color:var(--muted);font-size:11px}.stat strong{display:block;margin-top:8px;font-size:24px;letter-spacing:-.04em}.stat small{color:#688b33;font:10px var(--mono)}.toolbar{display:flex;align-items:center;gap:10px;padding:14px;border:1px solid var(--line);border-bottom:0;border-radius:6px 6px 0 0;background:var(--card)}.search{flex:1;min-width:120px;padding:11px 12px;border:1px solid var(--line);border-radius:4px;font:12px var(--sans)}.filter{padding:10px;border:1px solid var(--line);border-radius:4px;background:white;color:var(--ink);font:11px var(--mono)}.upload{padding:11px 14px;border:0;border-radius:4px;background:var(--ink);color:white;font-weight:600;cursor:pointer;white-space:nowrap}.upload:hover{background:#46503a}.drop{padding:22px;border:1px dashed #cfd4c4;border-radius:4px;background:#f8f9f3;color:#697061;text-align:center;font-size:11px}.drop.drag{border-color:#779a3c;background:#eef5e2}.drop strong{display:block;margin-bottom:5px;color:#42483c}.table{overflow:hidden;border:1px solid var(--line);border-radius:0 0 6px 6px;background:var(--card)}.table-head,.file-row{display:grid;grid-template-columns:minmax(210px,1.4fr) 1fr 120px 90px;align-items:center;gap:14px;padding:13px 17px}.table-head{border-bottom:1px solid var(--line);color:#83877e;font:10px var(--mono);text-transform:uppercase}.file-row{border-bottom:1px solid #eff0ea}.file-row:last-child{border-bottom:0}.file-name{display:flex;align-items:center;gap:10px;min-width:0}.file-icon{display:grid;width:32px;height:36px;flex:none;place-items:center;border:1px solid #e6e7df;border-radius:3px;background:#f4f4ef;color:#668639;font:9px var(--mono)}.file-name strong{display:block;overflow:hidden;font-size:11px;text-overflow:ellipsis;white-space:nowrap}.file-name small{display:block;margin-top:4px;color:var(--muted);font-size:9px}.file-date,.file-size{color:#676d62;font:10px var(--mono)}.folder{color:#587b2d;font:10px var(--mono)}.empty{padding:30px;text-align:center;color:var(--muted);font-size:12px}.note{margin-top:14px;color:var(--muted);font-size:10px;line-height:1.6}    .back{display:inline-block;margin-top:20px}input[type=file]{display:none}.table-head,.file-row{grid-template-columns:minmax(200px,1.4fr) 1fr 100px 75px 120px}.download-file{padding:7px 8px;border:1px solid var(--line);border-radius:3px;background:white;color:#43572d;font:9px var(--mono);cursor:pointer}.download-file:hover{border-color:#819958}.download-file:disabled{color:#999;border-color:#eee;cursor:default}.table-head span:last-child{text-align:left}@media(max-width:650px){.top{padding:0 16px}.top-actions a{padding:9px;font-size:9px}main{width:calc(100% - 28px)}.title-row{align-items:flex-start;flex-direction:column}.summary{gap:7px}.stat{padding:12px 9px}.stat strong{font-size:20px}.toolbar{flex-wrap:wrap;padding:10px}.search{flex-basis:100%}.filter{flex:1}.upload{flex:1}.table-head,.file-row{grid-template-columns:minmax(135px,1fr) 78px 67px;gap:7px;padding:11px 8px}.table-head span:nth-child(2),.file-date,.file-download-heading{display:none}.table-head span:last-child{text-align:right}.file-size{text-align:right}.folder{font-size:9px}.file-name{gap:6px}.download-file{padding:6px 5px;font-size:8px}}
+  </style>
+  <style>
+    @media(max-width:650px){
+      .table-head,.file-row{grid-template-columns:minmax(110px,1fr) 75px 105px}
+      .table-head span:nth-child(4),.file-size{display:none}
+    }
+  </style>
+</head>
+<body>
+  <header class="top">
+    <a class="brand" href="../index.html#projetos"><span>AG</span>ANTONY / LAB</a>
+    <div class="top-actions"><a href="../index.html#projetos">← Portfólio</a><a href="documentos.html" download="documentos.html">Baixar código ↓</a></div>
+  </header>
+  <main>
+    <div class="title-row"><div><div class="eyebrow">Projeto 03 · Demonstração front-end</div><h1>Arquivo organizado</h1></div><span class="demo-label">PROCESSAMENTO LOCAL</span></div>
+    <section class="summary" aria-label="Resumo de documentos">
+      <article class="stat"><span>Documentos no catálogo</span><strong id="total-count">06</strong><small>ARQUIVOS DE EXEMPLO</small></article>
+      <article class="stat"><span>Tipos identificados</span><strong id="type-count">04</strong><small>EXTENSÕES DETECTADAS</small></article>
+      <article class="stat"><span>Período mais recente</span><strong id="recent-year">2026</strong><small>ORGANIZAÇÃO TEMPORAL</small></article>
+    </section>
+    <section class="toolbar" aria-label="Ferramentas de busca e upload">
+      <input class="search" id="search" type="search" placeholder="Buscar documento..." aria-label="Buscar documentos" />
+      <select class="filter" id="type-filter" aria-label="Filtrar por tipo"><option value="all">Todos os tipos</option></select>
+      <label class="upload" for="file-input">＋ Adicionar arquivos</label>
+      <input id="file-input" type="file" multiple />
+    </section>
+    <div class="drop" id="drop-zone"><strong>Solte arquivos aqui para adicioná-los</strong>Os arquivos são lidos apenas pelo navegador; nada é enviado à internet.</div>
+    <section class="table" aria-label="Lista de documentos">
+      <div class="table-head"><span>Documento</span><span>Data de modificação</span><span>Organizado em</span><span>Tamanho</span><span class="file-download-heading">Ação</span></div>
+      <div id="file-list" aria-live="polite"></div>
+    </section>
+    <p class="note">Os arquivos escolhidos são processados localmente no navegador e não são enviados a um servidor. Use “Baixar organizado” para salvar uma cópia com a data no nome; o arquivo original não é alterado. O navegador não cria pastas automaticamente.</p>
+    <a class="back" href="../index.html#projetos">← Voltar aos projetos</a>
+  </main>
+  <script>
+    const documents = [
+      { name: "relatorio_operacional.pdf", type: "PDF", date: "2026-10-12", size: 2457600 },
+      { name: "controle_de_estoque.xlsx", type: "XLSX", date: "2026-09-28", size: 1048576 },
+      { name: "ata_reuniao.docx", type: "DOCX", date: "2026-08-16", size: 512000 },
+      { name: "dados_atendimento.csv", type: "CSV", date: "2026-07-04", size: 183000 },
+      { name: "manual_de_processos.pdf", type: "PDF", date: "2025-11-20", size: 3980000 },
+      { name: "inventario_anual.xlsx", type: "XLSX", date: "2025-04-03", size: 778000 }
+    ];
+    const list = document.querySelector("#file-list");
+    const search = document.querySelector("#search");
+    const filter = document.querySelector("#type-filter");
+    function formatDate(dateString) {
+      return new Intl.DateTimeFormat("pt-BR").format(new Date(`${dateString}T12:00:00`));
+    }
+    function formatSize(bytes) {
+      if (bytes < 1024) return `${bytes} B`;
+      if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(0)} KB`;
+      return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+    }
+    function extensionOf(name) {
+      const lastDot = name.lastIndexOf(".");
+      if (lastDot < 0 || lastDot === name.length - 1) return "SEM TIPO";
+      return name.slice(lastDot + 1).toUpperCase();
+    }
+    function render() {
+      const term = search.value.trim().toLocaleLowerCase("pt-BR");
+      const previousType = filter.value;
+      const types = Array.from(new Set(documents.map((file) => file.type))).sort();
+      filter.replaceChildren(new Option("Todos os tipos", "all"));
+      types.forEach((type) => filter.add(new Option(type, type)));
+      filter.value = types.includes(previousType) ? previousType : "all";
+      const visible = documents.filter((file) => file.name.toLocaleLowerCase("pt-BR").includes(term) && (filter.value === "all" || file.type === filter.value));
+      visible.sort((first, second) => second.date.localeCompare(first.date));
+      list.replaceChildren();
+      if (!visible.length) {
+        const empty = document.createElement("div");
+        empty.className = "empty";
+        empty.textContent = "Nenhum documento corresponde à busca.";
+        list.append(empty);
+      }
+      visible.forEach((file) => {
+        const row = document.createElement("div");
+        row.className = "file-row";
+        const name = document.createElement("div");
+        name.className = "file-name";
+        const icon = document.createElement("span");
+        icon.className = "file-icon";
+        icon.textContent = file.type;
+        const labels = document.createElement("span");
+        labels.style.minWidth = "0";
+        const title = document.createElement("strong");
+        title.textContent = file.name;
+        const subtitle = document.createElement("small");
+        subtitle.textContent = `${file.type} · ${formatSize(file.size)}`;
+        labels.append(title, subtitle);
+        name.append(icon, labels);
+        const date = document.createElement("span");
+        date.className = "file-date";
+        date.textContent = formatDate(file.date);
+        const folder = document.createElement("span");
+        folder.className = "folder";
+        folder.textContent = `/${file.date.slice(0, 4)}`;
+        const size = document.createElement("span");
+        size.className = "file-size";
+        size.textContent = formatSize(file.size);
+        const action = document.createElement("span");
+        if (file.blob) {
+          const download = document.createElement("button");
+          download.className = "download-file";
+          download.type = "button";
+          download.textContent = "Baixar organizado ↓";
+          download.addEventListener("click", () => downloadOrganized(file));
+          action.append(download);
+        } else {
+          action.className = "file-size";
+          action.textContent = "Exemplo";
+        }
+        row.append(name, date, folder, size, action);
+        list.append(row);
+      });
+      document.querySelector("#total-count").textContent = String(documents.length).padStart(2, "0");
+      document.querySelector("#type-count").textContent = new Set(documents.map((file) => file.type)).size.toString().padStart(2, "0");
+      document.querySelector("#recent-year").textContent = documents.reduce((latest, file) => file.date > latest ? file.date : latest, "").slice(0, 4) || "—";
+    }
+    function downloadOrganized(file) {
+      const link = document.createElement("a");
+      const objectUrl = URL.createObjectURL(file.blob);
+      link.href = objectUrl;
+      link.download = `${file.date}_${file.name.replace(/[\\/:*?"<>|]/g, "_")}`;
+      document.body.append(link);
+      link.click();
+      link.remove();
+      window.setTimeout(() => URL.revokeObjectURL(objectUrl), 60000);
+    }
+    function addFiles(fileList) {
+      Array.from(fileList).forEach((file) => {
+        const modified = Number.isFinite(file.lastModified) && file.lastModified >= 0 ? new Date(file.lastModified) : new Date();
+        const date = Number.isFinite(modified.getTime()) ? modified.toISOString().slice(0, 10) : new Date().toISOString().slice(0, 10);
+        documents.unshift({ name: file.name, type: extensionOf(file.name), date, size: file.size, blob: file });
+      });
+      render();
+    }
+    search.addEventListener("input", render);
+    filter.addEventListener("change", render);
+    document.querySelector("#file-input").addEventListener("change", (event) => {
+      addFiles(event.target.files);
+      event.target.value = "";
+    });
+    const dropZone = document.querySelector("#drop-zone");
+    dropZone.addEventListener("dragover", (event) => {
+      event.preventDefault();
+      dropZone.classList.add("drag");
+    });
+    dropZone.addEventListener("dragleave", () => dropZone.classList.remove("drag"));
+    dropZone.addEventListener("drop", (event) => {
+      event.preventDefault();
+      dropZone.classList.remove("drag");
+      addFiles(event.dataTransfer.files);
+    });
+    render();
+  </script>
+</body>
+</html>
